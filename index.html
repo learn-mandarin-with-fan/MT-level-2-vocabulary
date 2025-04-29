@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MT Level 2 词汇学习卡</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            background-color: #e74c3c;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .main-controls {
+            padding: 15px;
+            background: white;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .secondary-controls {
+            padding: 15px;
+            background: #ecf0f1;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+        
+        select, button {
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            min-width: 120px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        button.active {
+            background-color: #27ae60;
+        }
+        
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            width: 100%;
+            height: 150px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border-radius: 10px;
+            padding: 15px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        
+        .card-front {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .card-back {
+            background-color: #f1c40f;
+            color: #333;
+            transform: rotateY(180deg);
+        }
+        
+        .pinyin {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .chapter-title {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+            color: #2c3e50;
+        }
+        
+        .progress-container {
+            grid-column: 1 / -1;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #2ecc71;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        @media (max-width: 600px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-controls, .secondary-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>MT Level2 词汇学习卡</h1>
+    </div>
+    
+    <div class="main-controls">
+        <select id="chapterSelect">
+            <option value="all">所有章节</option>
+            <option value="C1">C1</option>
+            <option value="C2">C2</option>
+            <option value="C3">C3</option>
+            <option value="C4">C4</option>
+            <option value="C5">C5</option>
+            <option value="C6">C6</option>
+            <option value="C7">C7</option>
+            <option value="C8">C8</option>
+            <option value="C9">C9</option>
+            <option value="C10">C10</option>
+            <option value="C11">C11</option>
+            <option value="C12">C12</option>
+            <option value="C13">C13</option>
+            <option value="C14">C14</option>
+            <option value="C15">C15</option>
+        </select>
+        <button id="pinyinBtn" onclick="toggleCardType('pinyin')" class="active">拼音卡</button>
+        <button id="hanziBtn" onclick="toggleCardType('hanzi')">汉字卡</button>
+    </div>
+    
+    <div class="secondary-controls">
+        <button onclick="shuffleCards()">随机排序</button>
+        <button onclick="flipAllCards()">全部翻转</button>
+        <button onclick="resetAllCards()">重置卡片</button>
+    </div>
+    
+    <div class="card-container" id="cardContainer"></div>
+
+    <script>
+        // 完整的词汇数据
+        const vocabData = {
+            C1: [
+                { hanzi: "公司", pinyin: "gōngsī", english: "company" },
+                { hanzi: "饭馆", pinyin: "fànguǎn", english: "restaurant" },
+                { hanzi: "旁边", pinyin: "pángbiān", english: "beside" },
+                { hanzi: "新", pinyin: "xīn", english: "new" },
+                { hanzi: "饱", pinyin: "bǎo", english: "full (stomach)" },
+                { hanzi: "慢", pinyin: "màn", english: "slow" },
+                { hanzi: "帮", pinyin: "bāng", english: "to help" },
+                { hanzi: "等", pinyin: "děng", english: "to wait" },
+                { hanzi: "试", pinyin: "shì", english: "to try" },
+                { hanzi: "两", pinyin: "liǎng", english: "two" },
+                { hanzi: "位", pinyin: "wèi", english: "measure word for people (polite)" },
+                { hanzi: "告诉", pinyin: "gàosù", english: "to tell" },
+                { hanzi: "让", pinyin: "ràng", english: "to let/allow/ask" },
+                { hanzi: "知道", pinyin: "zhīdào", english: "to know" },
+                { hanzi: "时间", pinyin: "shíjiān", english: "time" },
+                { hanzi: "但是", pinyin: "dànshì", english: "but" }
+            ],
+            C2: [
+                { hanzi: "下班", pinyin: "xiàbān", english: "to leave work" },
+                { hanzi: "回家", pinyin: "huí jiā", english: "to go home" },
+                { hanzi: "打折", pinyin: "dǎ zhé", english: "to give discount" },
+                { hanzi: "觉得", pinyin: "juéde", english: "to think/feel" },
+                { hanzi: "手表", pinyin: "shǒubiǎo", english: "watch" },
+                { hanzi: "贵", pinyin: "guì", english: "expensive" },
+                { hanzi: "便宜", pinyin: "piányi", english: "cheap" },
+                { hanzi: "真", pinyin: "zhēn", english: "really" },
+                { hanzi: "件", pinyin: "jiàn", english: "measure word" },
+                { hanzi: "块", pinyin: "kuài", english: "measure word" },
+                { hanzi: "颜色", pinyin: "yánsè", english: "color" },
+                { hanzi: "还", pinyin: "hái", english: "passably/fairly" },
+                { hanzi: "可以", pinyin: "kěyǐ", english: "good/okay" },
+                { hanzi: "不错", pinyin: "búcuò", english: "pretty good" },
+                { hanzi: "先...然后", pinyin: "xiān...ránhòu", english: "first...then" },
+                { hanzi: "有点儿", pinyin: "yǒu diǎnr", english: "a little bit" }
+            ],
+            C3: [
+                { hanzi: "胖", pinyin: "pàng", english: "fat" },
+                { hanzi: "瘦", pinyin: "shòu", english: "thin" },
+                { hanzi: "棒", pinyin: "bàng", english: "excellent" },
+                { hanzi: "美", pinyin: "měi", english: "beautiful" },
+                { hanzi: "常常", pinyin: "chángcháng", english: "often" },
+                { hanzi: "运动", pinyin: "yùndòng", english: "to exercise" },
+                { hanzi: "走", pinyin: "zǒu", english: "to walk" },
+                { hanzi: "跑步", pinyin: "pǎobù", english: "to run" },
+                { hanzi: "爬山", pinyin: "páshān", english: "to hike" },
+                { hanzi: "每", pinyin: "měi", english: "each, every" },
+                { hanzi: "为什么", pinyin: "wèi shénme", english: "why" },
+                { hanzi: "因为", pinyin: "yīnwèi", english: "because" },
+                { hanzi: "所以", pinyin: "suǒyǐ", english: "so" },
+                { hanzi: "准备", pinyin: "zhǔnbèi", english: "to prepare" },
+                { hanzi: "起床", pinyin: "qǐchuáng", english: "to get up" },
+                { hanzi: "课", pinyin: "kè", english: "lesson" }
+            ],
+            C4: [
+                { hanzi: "旅游", pinyin: "lǚyóu", english: "to travel" },
+                { hanzi: "海边", pinyin: "hǎibiān", english: "seaside" },
+                { hanzi: "美食", pinyin: "měishí", english: "delicious food" },
+                { hanzi: "一起", pinyin: "yìqǐ", english: "together" },
+                { hanzi: "逛街", pinyin: "guàngjiē", english: "to go shopping" },
+                { hanzi: "家人", pinyin: "jiārén", english: "family" },
+                { hanzi: "家乡", pinyin: "jiāxiāng", english: "hometown" },
+                { hanzi: "可能", pinyin: "kěnéng", english: "maybe" },
+                { hanzi: "玩", pinyin: "wán", english: "to play" },
+                { hanzi: "好吃", pinyin: "hǎochī", english: "yummy" },
+                { hanzi: "欢迎", pinyin: "huānyíng", english: "to welcome" },
+                { hanzi: "次", pinyin: "cì", english: "time (measure word)" },
+                { hanzi: "一定", pinyin: "yídìng", english: "certainly" },
+                { hanzi: "要", pinyin: "yào", english: "to want to, to need" },
+                { hanzi: "别/不要...了", pinyin: "bié/búyào...le", english: "stop doing" }
+            ],
+            C5: [
+                { hanzi: "高", pinyin: "gāo", english: "tall" },
+                { hanzi: "长", pinyin: "zhǎng", english: "to grow" },
+                { hanzi: "眼睛", pinyin: "yǎnjīng", english: "eyes" },
+                { hanzi: "头发", pinyin: "tóufa", english: "hair" },
+                { hanzi: "看见", pinyin: "kàn jiàn", english: "to see" },
+                { hanzi: "看", pinyin: "kàn", english: "to look" },
+                { hanzi: "孩子", pinyin: "háizi", english: "kids" },
+                { hanzi: "女孩子", pinyin: "nǚ háizi", english: "girls" },
+                { hanzi: "左边", pinyin: "zuǒbiān", english: "left side" },
+                { hanzi: "已经", pinyin: "yǐjīng", english: "already" },
+                { hanzi: "机场", pinyin: "jīchǎng", english: "airport" },
+                { hanzi: "巧", pinyin: "qiǎo", english: "coincidental" },
+                { hanzi: "教室", pinyin: "jiàoshì", english: "classroom" },
+                { hanzi: "外", pinyin: "wài", english: "outer/outside" },
+                { hanzi: "最", pinyin: "zuì", english: "most" }
+            ],
+            C6: [
+                { hanzi: "生日", pinyin: "shēngrì", english: "birthday" },
+                { hanzi: "快乐", pinyin: "kuàilè", english: "happy" },
+                { hanzi: "过", pinyin: "guò", english: "to celebrate" },
+                { hanzi: "派对", pinyin: "pàiduì", english: "party" },
+                { hanzi: "请", pinyin: "qǐng", english: "to invite" },
+                { hanzi: "礼物", pinyin: "lǐwù", english: "gift" },
+                { hanzi: "送", pinyin: "sòng", english: "to give" },
+                { hanzi: "给", pinyin: "gěi", english: "to give" },
+                { hanzi: "鸡蛋", pinyin: "jīdàn", english: "egg" },
+                { hanzi: "面条", pinyin: "miàntiáo", english: "noodles" },
+                { hanzi: "身体", pinyin: "shēntǐ", english: "body" },
+                { hanzi: "健康", pinyin: "jiànkāng", english: "health/healthy" },
+                { hanzi: "祝", pinyin: "zhù", english: "to wish" },
+                { hanzi: "难", pinyin: "nán", english: "difficult" },
+                { hanzi: "希望", pinyin: "xīwàng", english: "to hope" },
+                { hanzi: "打开", pinyin: "dǎkāi", english: "to open/turn on" }
+            ],
+            C7: [
+                { hanzi: "生病", pinyin: "shēngbìng", english: "to be sick" },
+                { hanzi: "药", pinyin: "yào", english: "medicine" },
+                { hanzi: "住院", pinyin: "zhùyuàn", english: "to stay in hospital" },
+                { hanzi: "出院", pinyin: "chūyuàn", english: "to leave hospital" },
+                { hanzi: "检查", pinyin: "jiǎnchá", english: "to check/examine" },
+                { hanzi: "舒服", pinyin: "shūfu", english: "comfortable" },
+                { hanzi: "应该", pinyin: "yīnggāi", english: "should" },
+                { hanzi: "忙", pinyin: "máng", english: "busy" },
+                { hanzi: "同事", pinyin: "tóngshì", english: "colleague" },
+                { hanzi: "大家", pinyin: "dàjiā", english: "everyone" },
+                { hanzi: "记得", pinyin: "jìde", english: "to remember" },
+                { hanzi: "按时", pinyin: "ànshí", english: "on time" },
+                { hanzi: "快", pinyin: "kuài", english: "fast" },
+                { hanzi: "怎么", pinyin: "zěnme", english: "how come" },
+            ],
+            C8: [
+                { hanzi: "票", pinyin: "piào", english: "ticket" },
+                { hanzi: "音乐", pinyin: "yīnyuè", english: "music" },
+                { hanzi: "会", pinyin: "huì", english: "conference" },
+                { hanzi: "超市", pinyin: "chāoshì", english: "supermarket" },
+                { hanzi: "洗", pinyin: "xǐ", english: "to wash" },
+                { hanzi: "脸", pinyin: "liǎn", english: "face" },
+                { hanzi: "穿", pinyin: "chuān", english: "to wear" },
+                { hanzi: "客气", pinyin: "kèqi", english: "polite" },
+                { hanzi: "唱歌", pinyin: "chànggē", english: "to sing" },
+                { hanzi: "跳舞", pinyin: "tiàowǔ", english: "to dance" },
+                { hanzi: "开始", pinyin: "kāishǐ", english: "to start" },
+                { hanzi: "从小", pinyin: "cóngxiǎo", english: "from childhood" },
+                { hanzi: "有意思", pinyin: "yǒu yìsi", english: "interesting" },
+                { hanzi: "以前", pinyin: "yǐqián", english: "before" },
+                { hanzi: "以后", pinyin: "yǐhòu", english: "after" }
+            ],
+            C9: [
+                { hanzi: "打篮球", pinyin: "dǎ lánqiú", english: "play basketball" },
+                { hanzi: "踢足球", pinyin: "tī zúqiú", english: "play football" },
+                { hanzi: "游泳", pinyin: "yóuyǒng", english: "swim" },
+                { hanzi: "比赛", pinyin: "bǐsài", english: "competition" },
+                { hanzi: "第一", pinyin: "dì yī", english: "first" },
+                { hanzi: "得", pinyin: "dé", english: "to get" },
+                { hanzi: "帅", pinyin: "shuài", english: "handsome" },
+                { hanzi: "说话", pinyin: "shuōhuà", english: "to talk" },
+                { hanzi: "总是", pinyin: "zǒng shì", english: "always" },
+                { hanzi: "早", pinyin: "zǎo", english: "early" },
+                { hanzi: "晚", pinyin: "wǎn", english: "late" },
+                { hanzi: "恭喜", pinyin: "gōngxǐ", english: "to congratulate" },
+                { hanzi: "考虑", pinyin: "kǎolǜ", english: "to consider" },
+                { hanzi: "然后", pinyin: "ránhòu", english: "then" },
+                { hanzi: "带", pinyin: "dài", english: "to bring" }
+            ],
+            C10: [
+                { hanzi: "秋天", pinyin: "qiūtiān", english: "autumn" },
+                { hanzi: "冬天", pinyin: "dōngtiān", english: "winter" },
+                { hanzi: "雪", pinyin: "xuě", english: "snow" },
+                { hanzi: "下雪", pinyin: "xià xuě", english: "to snow" },
+                { hanzi: "滑雪", pinyin: "huáxuě", english: "to ski" },
+                { hanzi: "雨", pinyin: "yǔ", english: "rain" },
+                { hanzi: "下雨", pinyin: "xià yǔ", english: "to rain" },
+                { hanzi: "度", pinyin: "dù", english: "degree" },
+                { hanzi: "零", pinyin: "líng", english: "zero" },
+                { hanzi: "晴", pinyin: "qíng", english: "sunny" },
+                { hanzi: "阴", pinyin: "yīn", english: "overcast" },
+                { hanzi: "T恤", pinyin: "T xù", english: "t-shirt" },
+                { hanzi: "它", pinyin: "tā", english: "it" },
+                { hanzi: "妻子", pinyin: "qīzi", english: "wife" },
+                { hanzi: "孩子", pinyin: "háizi", english: "kid" },
+                { hanzi: "一样", pinyin: "yí yàng", english: "same" }
+            ],
+            C11: [
+                { hanzi: "地铁", pinyin: "dìtiě", english: "subway" },
+                { hanzi: "高铁", pinyin: "gāotiě", english: "high-speed rail" },
+                { hanzi: "火车", pinyin: "huǒchē", english: "train" },
+                { hanzi: "巴士", pinyin: "bāshì", english: "bus" },
+                { hanzi: "走路", pinyin: "zǒulù", english: "to walk" },
+                { hanzi: "师傅", pinyin: "shīfu", english: "polite title" },
+                { hanzi: "出口", pinyin: "chūkǒu", english: "exit" },
+                { hanzi: "叫", pinyin: "jiào", english: "to call" },
+                { hanzi: "下单", pinyin: "xià dān", english: "to place an order" },
+                { hanzi: "出发", pinyin: "chūfā", english: "to set off" },
+                { hanzi: "长", pinyin: "cháng", english: "long" },
+                { hanzi: "市区", pinyin: "shì qū", english: "urban district" },
+                { hanzi: "方便", pinyin: "fāngbiàn", english: "convenient" },
+                { hanzi: "左右", pinyin: "zuǒyòu", english: "about/around" },
+                { hanzi: "从", pinyin: "cóng", english: "from" },
+                { hanzi: "到", pinyin: "dào", english: "to arrive" }
+            ],
+            C12: [
+                { hanzi: "远", pinyin: "yuǎn", english: "far" },
+                { hanzi: "近", pinyin: "jìn", english: "close" },
+                { hanzi: "搬", pinyin: "bān", english: "to move" },
+                { hanzi: "公共汽车", pinyin: "gōnggòng qìchē", english: "bus" },
+                { hanzi: "羡慕", pinyin: "xiànmù", english: "to envy/admire" },
+                { hanzi: "一会儿", pinyin: "yìhuǐr", english: "for a while" },
+                { hanzi: "这样", pinyin: "zhèyàng", english: "this way" },
+                { hanzi: "只", pinyin: "zhǐ", english: "only" },
+                { hanzi: "地方", pinyin: "dìfang", english: "place" },
+                { hanzi: "市中心", pinyin: "shì zhōngxīn", english: "city center" },
+                { hanzi: "附近", pinyin: "fùjìn", english: "nearby" },
+                { hanzi: "往", pinyin: "wǎng", english: "to/towards" },
+                { hanzi: "一直", pinyin: "yì zhí", english: "straight/always" },
+                { hanzi: "路口", pinyin: "lùkǒu", english: "intersection" },
+                { hanzi: "定", pinyin: "dìng", english: "to set/decide" },
+                { hanzi: "离", pinyin: "lí", english: "to be away from" }
+            ],
+            C13: [
+                { hanzi: "宾馆", pinyin: "bīnguǎn", english: "hotel" },
+                { hanzi: "酒店", pinyin: "jiǔdiàn", english: "hotel" },
+                { hanzi: "单人间", pinyin: "dānrén jiān", english: "single room" },
+                { hanzi: "办理入住", pinyin: "bànlǐ rùzhù", english: "check in" },
+                { hanzi: "预订", pinyin: "yùdìng", english: "to book" },
+                { hanzi: "网上", pinyin: "wǎngshàng", english: "online" },
+                { hanzi: "姓", pinyin: "xìng", english: "surname" },
+                { hanzi: "房子", pinyin: "fángzi", english: "house" },
+                { hanzi: "房间", pinyin: "fángjiān", english: "room" },
+                { hanzi: "房东", pinyin: "fángdōng", english: "landlord" },
+                { hanzi: "租", pinyin: "zū", english: "to rent" },
+                { hanzi: "找", pinyin: "zhǎo", english: "to look for" },
+                { hanzi: "尽快", pinyin: "jǐnkuài", english: "as soon as possible" },
+                { hanzi: "进去", pinyin: "jìnqù", english: "to go in" },
+                { hanzi: "好运", pinyin: "hǎoyùn", english: "good luck" },
+                { hanzi: "最好", pinyin: "zuì hǎo", english: "the best/had better" }
+            ],
+            C14: [
+                { hanzi: "喂", pinyin: "wèi", english: "hello/hey" },
+                { hanzi: "考试", pinyin: "kǎoshì", english: "exam" },
+                { hanzi: "时间", pinyin: "shíjiān", english: "time" },
+                { hanzi: "参加", pinyin: "cānjiā", english: "to participate" },
+                { hanzi: "紧张", pinyin: "jǐnzhāng", english: "nervous" },
+                { hanzi: "难", pinyin: "nán", english: "difficult" },
+                { hanzi: "练习", pinyin: "liànxí", english: "to practice" },
+                { hanzi: "聊天", pinyin: "liáotiān", english: "to chat" },
+                { hanzi: "主意", pinyin: "zhǔyì", english: "idea/plan" },
+                { hanzi: "问", pinyin: "wèn", english: "to ask" },
+                { hanzi: "题", pinyin: "tí", english: "question (in exam)" },
+                { hanzi: "问题", pinyin: "wèn tí", english: "question/problem" },
+                { hanzi: "意思", pinyin: "yìsi", english: "meaning" },
+                { hanzi: "报纸", pinyin: "bàozhǐ", english: "newspaper" },
+                { hanzi: "错", pinyin: "cuò", english: "wrong" },
+                { hanzi: "对", pinyin: "duì", english: "right" }
+            ],
+            C15: [
+                { hanzi: "新年", pinyin: "xīnnián", english: "new year" },
+                { hanzi: "春节", pinyin: "chūnjié", english: "Spring Festival" },
+                { hanzi: "恭喜发财", pinyin: "gōngxǐ fācái", english: "wish you prosperous" },
+                { hanzi: "机票", pinyin: "jīpiào", english: "air ticket" },
+                { hanzi: "过", pinyin: "guò", english: "to pass/spend (time)" },
+                { hanzi: "歌剧", pinyin: "gējù", english: "opera" },
+                { hanzi: "倒数", pinyin: "dàoshǔ", english: "count backwards" },
+                { hanzi: "帮助", pinyin: "bāngzhù", english: "to help" },
+                { hanzi: "干杯", pinyin: "gānbēi", english: "cheers" },
+                { hanzi: "酒吧", pinyin: "jiǔbā", english: "bar" },
+                { hanzi: "热闹", pinyin: "rè'nao", english: "bustling" },
+                { hanzi: "留", pinyin: "liú", english: "to stay" },
+                { hanzi: "带", pinyin: "dài", english: "to bring" },
+                { hanzi: "进", pinyin: "jìn", english: "to enter" },
+                { hanzi: "快", pinyin: "kuài", english: "fast" },
+                { hanzi: "小心", pinyin: "xiǎoxīn", english: "careful" }
+            ],
+        };
+
+        let currentCardType = 'pinyin';
+        let allCards = [];
+        let progressData = {
+            total: 0,
+            reviewed: 0,
+            mastered: 0
+        };
+
+        // 生成卡片
+        function generateCards() {
+            const container = document.getElementById('cardContainer');
+            const chapter = document.getElementById('chapterSelect').value;
+            container.innerHTML = '';
+
+            // 添加章节标题
+            if (chapter !== 'all') {
+                const title = document.createElement('div');
+                title.className = 'chapter-title';
+                title.textContent = `第 ${chapter.substring(1)} 课`;
+                container.appendChild(title);
+            }
+
+            // 添加进度条
+            const progressContainer = document.createElement('div');
+            progressContainer.className = 'progress-container';
+            progressContainer.innerHTML = `
+                <div>学习进度</div>
+                <div class="progress-bar">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressText">0%</span>
+                    <span id="cardCount">0/0</span>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalCards">0</div>
+                        <div class="stat-label">总卡片</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="reviewedCards">0</div>
+                        <div class="stat-label">已学习</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="masteredCards">0</div>
+                        <div class="stat-label">已掌握</div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(progressContainer);
+
+            const selectedData = chapter === 'all' 
+                ? Object.values(vocabData).flat() 
+                : vocabData[chapter];
+
+            // 初始化进度数据
+            progressData = {
+                total: selectedData.length,
+                reviewed: 0,
+                mastered: 0
+            };
+
+            allCards = [];
+            selectedData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = index;
+                card.dataset.reviewed = "false";
+                card.dataset.mastered = "false";
+                
+                let frontContent = '';
+                let backContent = '';
+                
+                if (currentCardType === 'pinyin') {
+                    frontContent = item.pinyin;
+                    backContent = item.english;
+                } else {
+                    frontContent = item.hanzi;
+                    backContent = item.pinyin;
+                }
+                
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">
+                            ${frontContent}
+                            ${currentCardType === 'hanzi' ? `<div class="pinyin">点击查看拼音</div>` : ''}
+                        </div>
+                        <div class="card-back">
+                            ${backContent}
+                            ${currentCardType === 'pinyin' ? `<div class="pinyin">${item.hanzi}</div>` : ''}
+                            <div class="card-controls">
+                                <button class="master-btn" onclick="markAsMastered(event, ${index})">已掌握</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', (e) => {
+                    // 防止点击按钮时触发卡片翻转
+                    if (!e.target.classList.contains('master-btn')) {
+                        card.classList.toggle('flipped');
+                        if (!card.dataset.reviewed || card.dataset.reviewed === "false") {
+                            card.dataset.reviewed = "true";
+                            progressData.reviewed++;
+                            updateProgress();
+                        }
+                    }
+                });
+                
+                container.appendChild(card);
+                allCards.push(card);
+            });
+
+            updateProgress();
+        }
+
+        // 标记为已掌握
+        function markAsMastered(event, index) {
+            event.stopPropagation(); // 阻止事件冒泡
+            const card = allCards[index];
+            
+            if (card.dataset.mastered === "false") {
+                card.dataset.mastered = "true";
+                card.querySelector('.master-btn').textContent = "✓ 已掌握";
+                card.querySelector('.master-btn').style.backgroundColor = "#2ecc71";
+                progressData.mastered++;
+            } else {
+                card.dataset.mastered = "false";
+                card.querySelector('.master-btn').textContent = "已掌握";
+                card.querySelector('.master-btn').style.backgroundColor = "#3498db";
+                progressData.mastered--;
+            }
+            
+            updateProgress();
+        }
+
+        // 更新进度条
+        function updateProgress() {
+            const progress = Math.round((progressData.reviewed / progressData.total) * 100);
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `${progress}%`;
+            document.getElementById('cardCount').textContent = `${progressData.reviewed}/${progressData.total}`;
+            document.getElementById('totalCards').textContent = progressData.total;
+            document.getElementById('reviewedCards').textContent = progressData.reviewed;
+            document.getElementById('masteredCards').textContent = progressData.mastered;
+        }
+
+        // 切换卡片类型
+        function toggleCardType(type) {
+            currentCardType = type;
+            generateCards();
+            
+            // 更新按钮样式
+            document.getElementById('pinyinBtn').classList.toggle('active', type === 'pinyin');
+            document.getElementById('hanziBtn').classList.toggle('active', type === 'hanzi');
+        }
+
+        // 随机排序卡片
+        function shuffleCards() {
+            const container = document.getElementById('cardContainer');
+            const cards = Array.from(container.querySelectorAll('.card:not(.chapter-title):not(.progress-container)'));
+            
+            // 随机排序
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                container.appendChild(cards[j]);
+            }
+        }
+
+        // 全部翻转卡片
+        function flipAllCards() {
+            const cards = document.querySelectorAll('.card:not(.chapter-title):not(.progress-container)');
+            let allFlipped = true;
+            
+            // 检查是否所有卡片都已翻转
+            cards.forEach(card => {
+                if (!card.classList.contains('flipped')) {
+                    allFlipped = false;
+                }
+            });
+            
+            // 根据当前状态决定翻转或重置
+            cards.forEach(card => {
+                if (allFlipped) {
+                    card.classList.remove('flipped');
+                } else {
+                    card.classList.add('flipped');
+                    if (!card.dataset.reviewed || card.dataset.reviewed === "false") {
+                        card.dataset.reviewed = "true";
+                        progressData.reviewed++;
+                    }
+                }
+            });
+            
+            updateProgress();
+        }
+
+        // 重置所有卡片（全部翻回正面）
+        function resetAllCards() {
+            const cards = document.querySelectorAll('.card:not(.chapter-title):not(.progress-container)');
+            cards.forEach(card => {
+                card.classList.remove('flipped');
+            });
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            generateCards();
+            document.getElementById('chapterSelect').addEventListener('change', generateCards);
+        });
+    </script>
+</body>
+</html>
